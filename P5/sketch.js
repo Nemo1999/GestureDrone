@@ -9,7 +9,7 @@ function preload() {
 function setup() {
   createCanvas(windowWidth, windowHeight, WEBGL)
   textFont(inconsolata);
-  textSize(width / 20)
+  textSize(width / 50)
   textAlign(CENTER, CENTER);
   // Instantiate our SerialPort object
   serial = new p5.SerialPort();
@@ -103,13 +103,13 @@ function draw() {
                 -sy  ,          cy*sx ,  cy*cx        , 0.0 ,
                   0.0, 0.0, 0.0,  1.0);
   */
-  box(windowWidth/7 , windowHeight/7);
+  box(width/7 , height/7);
   pop();
   fill('black');
   
-  text('Wx :'+str(Wx).slice(0,5) , 100,100);
-  text('Wy :'+str(Wy).slice(0,5) , 100,50);
-  text('Wz :'+str(Wz).slice(0,5) , 100,0);
+  text('Wx :'+str(Wx).slice(0,5) , width/5,height/5);
+  text('Wy :'+str(Wy).slice(0,5) , width/5,height/10);
+  text('Wz :'+str(Wz).slice(0,5) , width/5,0);
 /*
   /*
 

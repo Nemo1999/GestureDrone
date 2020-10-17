@@ -4,9 +4,9 @@
   for example :
 
 ```bash
-	npm install --global http-server
+	npm install --global live-server
 	cd .../GestureDrone/P5 
-	http-server .
+	live-server .
 ```
 - One can also upload the files(except "p5.js") to p5.js [online editor](https://editor.p5js.org/)
 
