@@ -164,7 +164,7 @@ const unsigned int outPort = 9999;          // remote port to receive OSC
 // ================================================================
 # include <espnow.h>
 
-uint8_t broadcastAddress[] = {0x50, 0x02, 0x91, 0xDF, 0x34, 0xAC};
+uint8_t broadcastAddress[] = {0x10, 0x52, 0x1C, 0xEF, 0x81, 0xC3};
 #define BOARD_ID 1
 
 typedef struct ESP_NOW_MESSAGE{
@@ -383,6 +383,12 @@ void mpu_loop()
 
     if(asm_ccount()%16000000>8000000&&time0==1){
     Serial.printf("{\"gyro\":{\"x\":%3f,\"y\":%3f,\"z\":%3f}}\n",euler[2] * 180/M_PI, euler[1] * 180/M_PI, euler[0] * 180/M_PI);
+    
+    sender_message.board_id = BOARD_ID;
+    sender_message.x = euler[2] * 180/M_PI;
+    sender_message.y = euler[1] * 180/M_PI;
+    sender_message.z = euler[0] * 180/M_PI;
+    esp_now_send(0, (uint8_t *) &sender_message, sizeof(sender_message));  
     time0 = 0;
     }
     if(asm_ccount()%16000000<8000000&&time1==0){
@@ -443,12 +449,7 @@ void mpu_loop()
     //Serial.printf("%d\n",asm_ccount()%8000000);
     if(asm_ccount()%16000000>8000000&&time1==1){
     Serial.printf("{\"acc\":{\"x\":%d , \"y\":%d , \"z\":%d}}\n",aaWorld.x,aaWorld.y,aaWorld.z);
-    esp_now_message.board_id = BOARD_ID
-    esp_now_message.x = aa.World.x;
-    esp_now_message.y = aa.World.y;
-    esp_now_message.z = aa.World.z;
-    esp_now_send(0, (uint8_t *) &esp_now_message, sizeof(esp_now_message))  
-      time1 = 0;
+    time1 = 0;
     }
     if(asm_ccount()%16000000<8000000&&time1==0){
       time1 = 1;  
