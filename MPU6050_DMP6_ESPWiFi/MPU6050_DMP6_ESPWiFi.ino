@@ -106,7 +106,6 @@ VectorInt16 aaReal;     // [x, y, z]            gravity-free accel sensor measur
 VectorInt16 aaWorld;    // [x, y, z]            world-frame accel sensor measurements
 VectorFloat gravity;    // [x, y, z]            gravity vector
 
-
 // uncomment "OUTPUT_READABLE_QUATERNION" if you want to see the actual
 // quaternion components in a [w, x, y, z] format (not best for parsing
 // on a remote host such as Processing or something though)
@@ -157,6 +156,70 @@ const char DEVICE_NAME[] = "mpu6050";
 WiFiUDP Udp;                                // A UDP instance to let us send and receive packets over UDP
 const IPAddress outIp(192, 168, 1, 11);     // remote IP to receive OSC
 const unsigned int outPort = 9999;          // remote port to receive OSC
+
+
+
+// ================================================================
+// ===                    SETTING FOR ESP_NOW                   ===
+// ================================================================
+# include <espnow.h>
+
+uint8_t broadcastAddress[] = {0x50, 0x02, 0x91, 0xDF, 0x34, 0xAC};
+#define BOARD_ID 1
+
+typedef struct ESP_NOW_MESSAGE{
+  int board_id;
+  int x;
+  int y;
+  int z;
+}esp_now_message;
+
+esp_now_message sender_message;
+
+unsigned long lastTime = 0;
+unsigned long timerDelay = 10000;
+
+// ================================================================
+// ===                  FUNCTIONS FOR ESP_NOW                   ===
+// ================================================================
+
+
+void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
+  Serial.print("\r\nLast Packet Send Status: ");
+  if (sendStatus == 0){
+    Serial.println("Delivery success");
+  }
+  else{
+    Serial.println("Delivery fail");
+  }
+}
+
+
+
+void esp_setup()
+{
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+
+  // Init ESP-NOW
+  if (esp_now_init() != 0) {
+    Serial.println("Error initializing ESP-NOW");
+    return;
+  } 
+  // Set ESP-NOW role
+  esp_now_set_self_role(ESP_NOW_ROLE_CONTROLLER);
+
+  // Once ESPNow is successfully init, we will register for Send CB to
+  // get the status of Trasnmitted packet
+  esp_now_register_send_cb(OnDataSent);
+  
+  // Register peer
+  esp_now_add_peer(broadcastAddress, ESP_NOW_ROLE_SLAVE, 1, NULL, 0);
+  
+}
+
+
+
 
 // ================================================================
 // ===               INTERRUPT DETECTION ROUTINE                ===
@@ -243,6 +306,7 @@ void setup(void)
   //Serial.print(F("WiFi connected! IP address: "));
   //Serial.println(WiFi.localIP());
 
+  esp_setup();
   mpu_setup();
 }
 
@@ -379,6 +443,11 @@ void mpu_loop()
     //Serial.printf("%d\n",asm_ccount()%8000000);
     if(asm_ccount()%16000000>8000000&&time1==1){
     Serial.printf("{\"acc\":{\"x\":%d , \"y\":%d , \"z\":%d}}\n",aaWorld.x,aaWorld.y,aaWorld.z);
+    esp_now_message.board_id = BOARD_ID
+    esp_now_message.x = aa.World.x;
+    esp_now_message.y = aa.World.y;
+    esp_now_message.z = aa.World.z;
+    esp_now_send(0, (uint8_t *) &esp_now_message, sizeof(esp_now_message))  
       time1 = 0;
     }
     if(asm_ccount()%16000000<8000000&&time1==0){
