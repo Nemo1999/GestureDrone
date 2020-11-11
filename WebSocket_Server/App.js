@@ -3,15 +3,16 @@ const app = express()
 
 //open express server on port 3000
 const server = require('http').Server(app)
-    .listen(3000,()=>{console.log('open server!')})
+    .listen( 3000 , ()=>{console.log('listening on 3000')})
+
+//open socket server on port 3000
+const io = require('socket.io')(server)
+
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname+'/index.html');
 });
 
-
-//open socket server on port 3000
-const io = require('socket.io')(server)
 
 io.on('connection', socket => {
   console.log('success connect!');
