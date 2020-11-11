@@ -5,9 +5,9 @@
 // Must match the sender structure
 typedef struct ESP_NOW_MESSAGE{
   int board_id;
-  int x;
-  int y;
-  int z;
+  float x;
+  float y;
+  float z;
 }esp_now_message;
 
 volatile bool received = false;
@@ -63,12 +63,13 @@ void loop(){
   // Access the variables for each board
   if(received)
   {
-    Serial.print("Packet received from: ");
-    Serial.printf("Board ID %d:\n", boardsStruct[myData.board_id-1].board_id);
-    Serial.printf("x value: %d \n", boardsStruct[myData.board_id-1].x);
-    Serial.printf("y value: %d \n", boardsStruct[myData.board_id-1].y);
-    Serial.printf("z value: %d \n", boardsStruct[myData.board_id-1].z);
-    Serial.println();
+    Serial.printf("{\"gyro\":{\"x\":%3f,\"y\":%3f,\"z\":%3f,\"id\":%d}}\n",boardsStruct[myData.board_id-1].x,boardsStruct[myData.board_id-1].y,boardsStruct[myData.board_id-1].z,boardsStruct[myData.board_id-1].board_id);
+    //Serial.print("Packet received from: ");
+    //Serial.printf("Board ID %d:\n", boardsStruct[myData.board_id-1].board_id);
+    //Serial.printf("x value: %d \n", boardsStruct[myData.board_id-1].x);
+    //Serial.printf("y value: %d \n", boardsStruct[myData.board_id-1].y);
+    //Serial.printf("z value: %d \n", boardsStruct[myData.board_id-1].z);
+    //Serial.println();
     received = false;  
   }
   

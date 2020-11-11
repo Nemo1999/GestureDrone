@@ -5,6 +5,11 @@ const app = express()
 const server = require('http').Server(app)
     .listen(3000,()=>{console.log('open server!')})
 
+app.get('/', (req, res) => {
+  res.sendFile(__dirname+'/index.html');
+});
+
+
 //open socket server on port 3000
 const io = require('socket.io')(server)
 

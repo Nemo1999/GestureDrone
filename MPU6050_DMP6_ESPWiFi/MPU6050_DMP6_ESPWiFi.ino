@@ -164,14 +164,15 @@ const unsigned int outPort = 9999;          // remote port to receive OSC
 // ================================================================
 # include <espnow.h>
 
-uint8_t broadcastAddress[] = {0x10, 0x52, 0x1C, 0xEF, 0x81, 0xC3};
+//uint8_t broadcastAddress[] = {0x10, 0x52, 0x1C, 0xEF, 0x81, 0xC3};
+uint8_t broadcastAddress[] = {0x50, 0x02, 0x91, 0xdf, 0x34, 0xac};
 #define BOARD_ID 1
 
 typedef struct ESP_NOW_MESSAGE{
   int board_id;
-  int x;
-  int y;
-  int z;
+  float x;
+  float y;
+  float z;
 }esp_now_message;
 
 esp_now_message sender_message;
