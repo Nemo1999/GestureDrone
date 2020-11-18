@@ -22,7 +22,7 @@ io.on('connection', socket => {
 const SerialPort = require('serialport')
 const Readline = require('@serialport/parser-readline')
 // open serial port
-const port = new SerialPort('/dev/ttyUSB0', { baudRate: 9600  })
+const port = new SerialPort('/dev/input/js0', { baudRate: 9600  })
 // feed port input to a line parser
 const parser = port.pipe(new Readline({delimiter: '\n'} ))
 // when parser get a line , send it to the socket

@@ -37,7 +37,7 @@
 	</a-entity>
       </a-entity>
     </a-scene>
-    <script>
+    <script type="text/javascript" src="script_for_aframe.js">
       let Sensors = {humd:80,gyro:{x:0,y:0,z:0},acc:{x:0,y:0,z:0},temp:28};
       let reset = false;
       let BiasAng = {Bx:0,By:0,Bz:0};
@@ -69,7 +69,14 @@
 	  Sensors =  ({...Sensors,...diff});
 	  //console.log(diff);
 	  //console.log(Sensors);
-	  
+
+
+	  //------------ Joy stick ------------
+
+
+
+
+
 	  updateView();
 	  if(reset){
 	      BiasAng = {
