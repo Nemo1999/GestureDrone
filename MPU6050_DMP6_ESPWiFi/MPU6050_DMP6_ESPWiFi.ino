@@ -150,7 +150,7 @@ float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gra
 #endif
 
 #define INTERRUPT_PIN 15 // use pin 15 on ESP8266
-
+#define CYCLE  2000000 // the clock cycle between each message event;
 const char DEVICE_NAME[] = "mpu6050";
 
 WiFiUDP Udp;                                // A UDP instance to let us send and receive packets over UDP
@@ -382,7 +382,7 @@ void mpu_loop()
     mpu.dmpGetQuaternion(&q, fifoBuffer);
     mpu.dmpGetEuler(euler, &q);
 
-    if(asm_ccount()%16000000>8000000&&time0==1){
+    if(asm_ccount()%CYCLE>CYCLE/2&&time0==1){
     Serial.printf("{\"gyro\":{\"x\":%3f,\"y\":%3f,\"z\":%3f}}\n",euler[2] * 180/M_PI, euler[1] * 180/M_PI, euler[0] * 180/M_PI);
     
     sender_message.board_id = BOARD_ID;
@@ -392,7 +392,7 @@ void mpu_loop()
     esp_now_send(0, (uint8_t *) &sender_message, sizeof(sender_message));  
     time0 = 0;
     }
-    if(asm_ccount()%16000000<8000000&&time1==0){
+    if(asm_ccount()%CYCLE<CYCLE/2&&time1==0){
       time0 = 1;
     }
     /*
@@ -415,7 +415,7 @@ void mpu_loop()
     Serial.printf("{\"gyro\":{\"x\":%3f,\"y\":%3f,\"z\":%3f}}\n",ypr[0] * 180/M_PI,ypr[1] * 180/M_PI,ypr[2] * 180/M_PI);
     time0 = 0;
     }
-    if(asm_ccount()%16000000<8000000&&time1==0){
+    if(asm_ccount()%CYCLE<CYCLE/2&&time1==0){
       time0 = 1;
     }
     /*Serial.print(ypr[0] * 180/M_PI);
@@ -448,11 +448,11 @@ void mpu_loop()
     mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
     mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
     //Serial.printf("%d\n",asm_ccount()%8000000);
-    if(asm_ccount()%16000000>8000000&&time1==1){
+    if(asm_ccount()%CYCLE>CYCLE/2&&time1==1){
     Serial.printf("{\"acc\":{\"x\":%d , \"y\":%d , \"z\":%d}}\n",aaWorld.x,aaWorld.y,aaWorld.z);
     time1 = 0;
     }
-    if(asm_ccount()%16000000<8000000&&time1==0){
+    if(asm_ccount()%CYCLE<CYCLE/2&&time1==0){
       time1 = 1;  
     }
     /*Serial.print(aaWorld.x);
