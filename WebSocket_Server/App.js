@@ -23,6 +23,7 @@ app.get('/script_for_aframe.js', (req, res) => {
 });
 
 
+
 //--------------- socket ----------------
 //open socket server on port 3000
 const io = require('socket.io')(server)
@@ -31,17 +32,26 @@ io.on('connection', socket => {
 })
 
 /*------ read from sensor input ----------
+
+
+
 const SerialPort = require('serialport')
 const Readline = require('@serialport/parser-readline')
+
+    
 // open serial port
-const port = new SerialPort('/dev/ttyUSB0', { baudRate: 9600 })
+
+const port = new SerialPort('/dev/ttyUSB0', { baudRate: 9600  })
+//console.log(port)
+
 // feed port input to a line parser
 const parser = port.pipe(new Readline({delimiter: '\n'} ))
 // when parser get a line , send it to the socket
 parser.on('data', line => {  
     io.sockets.emit('update_data', line);
-    //console.log(line);
+    console.log(line);
 })
+
 */
 
 //------ read from sensor joystick --------
@@ -73,3 +83,8 @@ gamepad.on("move", function (id, axis, value) {
     io.sockets.emit('update_data', str);
     console.log(str);
 });
+
+
+    
+
+
