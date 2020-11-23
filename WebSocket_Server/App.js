@@ -48,9 +48,6 @@ parser.on('data', line => {
 var gamepad = require("gamepad")
 gamepad.init()
 setInterval(gamepad.processEvents, 10);
-x_update = 0
-y_update = 0
-z_update = 0
 gamepad.on("move", function (id, axis, value) {
     x = 0
     y = 0
@@ -73,9 +70,6 @@ gamepad.on("move", function (id, axis, value) {
         z = -value*90
         str = "{\"gyro\":{\"x\":"+x+",\"y\":"+y+",\"z\":"+z+"}}"
     }
-    x_update = x
-    y_update = y
-    z_update = z
     io.sockets.emit('update_data', str);
     console.log(str);
 });

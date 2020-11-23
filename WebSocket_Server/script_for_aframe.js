@@ -17,6 +17,8 @@ window.addEventListener("keydown",handleKeyDown);
 
 //------------ socket for sensor------------
 var socket = io();
+
+
 socket.on("update_data", (data) =>
 {
 	let  diff
@@ -30,7 +32,7 @@ socket.on("update_data", (data) =>
 	Sensors =  ({...Sensors,...diff});
 	//console.log(diff);
 	//console.log(Sensors);
-	updateView();
+	//updateView();
 	if(reset){
 	    BiasAng = {
 		Bx: Sensors.gyro.x,
@@ -41,6 +43,8 @@ socket.on("update_data", (data) =>
 
 	}
 });
+
+
 //------------ A-frame ------------
 //const entityEl = document.querySelector("a-entity");
 const sceneEl = document.querySelector("a-scene");
@@ -75,9 +79,9 @@ const updateView = () => {
       =========================================*/
 
 	  //angY = -\Wz;
-
-	  rotateY.setAttribute("rotation",{x:0,y:angY,z:0});
-	  rotateController.setAttribute("rotation", { x: Wx, y:0 , z: -Wy });
+      let angle_panelty = 0.5;
+	  rotateY.setAttribute("rotation",{x:0,y:angle_panelty*angY,z:0});
+	  rotateController.setAttribute("rotation", { x: angle_panelty*Wx, y:0 , z: -(Wy*angle_panelty) });
 	  // box.setAttribute("rotation", { x: Wx, y: Wy, z: Wz });
 	  const { x, y, z } = translateController.getAttribute("position");
 	  //console.log([x,y,z]);
@@ -85,7 +89,7 @@ const updateView = () => {
 	  let  dy1 = 0;
 	  let  dx2 = 0;
 	  let  dy2 = 0;
-	  let strip=10;
+	  let strip=5;
 	  if(Math.abs(Wy)>10){
 	      dx1 = strip*Math.cos(angY/180*Math.PI)*0.05 * Math.sign(Wy)*Math.min(3,Math.abs(Wy));
 	      dy1 = strip*Math.sin(angY/180*Math.PI)*0.05 * Math.sign(Wy)*Math.min(3,Math.abs(Wy));
@@ -100,3 +104,6 @@ const updateView = () => {
 	      z: z + dy1 + dy2
 	  });
 };
+
+
+setInterval(updateView, 1);
