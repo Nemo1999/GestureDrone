@@ -64,7 +64,7 @@ void loop(){
   // Access the variables for each board
   if(received)
   {
-    Serial.printf("{\"gyro%d\":{\"x\":%3f,\"y\":%3f,\"z\":%3f,\"id\":%d}}\n",myData.board_id,boardsStruct[myData.board_id-1].x,boardsStruct[myData.board_id-1].y,boardsStruct[myData.board_id-1].z,boardsStruct[myData.board_id-1].board_id);
+    Serial.printf("{\"gyro%d\":{\"x\":%3f,\"y\":%3f,\"z\":%3f}}\n",myData.board_id,boardsStruct[myData.board_id-1].x,boardsStruct[myData.board_id-1].y,boardsStruct[myData.board_id-1].z);
     //Serial.print("Packet received from: ");
     //Serial.printf("Board ID %d:\n", boardsStruct[myData.board_id-1].board_id);
     //Serial.printf("x value: %d \n", boardsStruct[myData.board_id-1].x);
