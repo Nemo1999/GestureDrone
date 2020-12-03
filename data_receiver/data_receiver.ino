@@ -70,7 +70,10 @@ void loop(){
     //Serial.printf("x value: %d \n", boardsStruct[myData.board_id-1].x);
     //Serial.printf("y value: %d \n", boardsStruct[myData.board_id-1].y);
     //Serial.printf("z value: %d \n", boardsStruct[myData.board_id-1].z);
-    //Serial.println();
+    //Serial.println()
+    
+    
+    ;
     received = false;  
   }
   
