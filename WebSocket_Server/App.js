@@ -44,31 +44,48 @@ parser.on('data', line => {
 })
 */
 
+
+x = 0
+y = 0
+z = 0
+h = 0
+
+
 //------ read from sensor joystick --------
 var gamepad = require("gamepad")
 gamepad.init()
 setInterval(gamepad.processEvents, 10);
 gamepad.on("move", function (id, axis, value) {
-    x = 0
-    y = 0
-    z = 0
-    var str = "{\"gyro\":{\"x\":"+x+",\"y\":"+y+",\"z\":"+z+"}}"
-    console.log(value);
-    // 搖桿左右
+
+/*console.log("move", {
+    id: id,
+    axis: axis,
+    value: value,
+  });*/
+
+    var str = "{\"gyro\":{\"x\":"+x+",\"y\":"+y+",\"z\":"+z+",\"h\":"+h+"}}"
+    // 左邊搖桿左右
+    if(axis==0)
+    {
+        z = value*90
+        str = "{\"gyro\":{\"x\":"+x+",\"y\":"+y+",\"z\":"+z+",\"h\":"+h+"}}"
+    }
+    if(axis==1)
+    {
+        h = value*90
+        str = "{\"gyro\":{\"x\":"+x+",\"y\":"+y+",\"z\":"+z+",\"h\":"+h+"}}"
+    }
+    // 右邊搖桿左右
     if(axis==3)
     {
-        x = 0
         y = -value*90
-        z = 0
-        str = "{\"gyro\":{\"x\":"+x+",\"y\":"+y+",\"z\":"+z+"}}"
+        str = "{\"gyro\":{\"x\":"+x+",\"y\":"+y+",\"z\":"+z+",\"h\":"+h+"}}"
     }
-    // 搖桿上下
+    // 右邊搖桿上下
     if(axis==4)
     {
         x = -value*90
-        y = 0
-        z = -value*90
-        str = "{\"gyro\":{\"x\":"+x+",\"y\":"+y+",\"z\":"+z+"}}"
+        str = "{\"gyro\":{\"x\":"+x+",\"y\":"+y+",\"z\":"+z+",\"h\":"+h+"}}"
     }
     io.sockets.emit('update_data', str);
     console.log(str);

@@ -16,24 +16,28 @@
 <body>
 <noscript>You need to enable JavaScript to run this app.</noscript>
 <div id="root"></div>
-<a-scene physics="gravity:0">
+<a-scene physics="gravity:0; restitution:0;">
 
-    <a-box id="box" rotation="0 0 0" position="0 1.3 -1" depth="0.5" height="0.3" width="0.5" color="#EF2D5E" ></a-box>
+    <a-box id="box" rotation="0 0 0" position="0 1.3 -1" depth="0.5" height="0.3" width="0.5" color="#EF2D5E" mass="100" staic-body></a-box>
 
 
     <a-entity id="translate" position="-0.08 1.5 -1.5">
         <a-entity scale="5 5 5">
-            <a-entity id="text" text="value: Hello World; color: #EF2D5E"></a-entity>
+            <a-entity id="text" text="value: Welcome Prof.Hou; color: #3F3F37" static-body></a-entity>
         </a-entity>
     </a-entity>
 
 
     <a-entity id="rotate-controller" rotation="0 0 0">
         <a-entity id="rotateY" rotation="0 0 0">
-            <a-entity id="translate-controller" position="-1 -2 0">
+            <a-entity id="translate-controller" position="0 0 0">
+                <!--<a-plane color="#000000" scale="500 500 1" repeat="5 5 1" rotation="-90 0 0 " static-body></a-plane>-->
                 <a-entity environment="preset: forest;" static-body></a-entity>
 
                 <a-sky color="#ECECEC"></a-sky>
+
+                <!--<a-box id="box_1" rotation="0 0 0" position="110 1.3 -1" depth="100" height="100" width="100"
+                       color="#EF0D5F" mass="100" dynamic-body></a-box>-->
 
             </a-entity>
         </a-entity>
