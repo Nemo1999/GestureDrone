@@ -5,9 +5,12 @@
 // Must match the sender structure
 typedef struct ESP_NOW_MESSAGE{
   int board_id;
-  float x;
-  float y;
-  float z;
+  float gyroX;
+  float gyroY;
+  float gyroZ;
+  float accX;
+  float accY;
+  float accZ;
 }esp_now_message;
 
 volatile bool received = false;
@@ -33,9 +36,12 @@ void OnDataRecv(uint8_t * mac_addr, uint8_t *incomingData, uint8_t len) {
   memcpy(&myData, incomingData, sizeof(myData));
   
   // Update the structures with the new incoming data
-  boardsStruct[myData.board_id-1].x = myData.x;
-  boardsStruct[myData.board_id-1].y = myData.y;
-  boardsStruct[myData.board_id-1].z = myData.z;
+  boardsStruct[myData.board_id-1].gyroX = myData.gyroX;
+  boardsStruct[myData.board_id-1].gyroY = myData.gyroY;
+  boardsStruct[myData.board_id-1].gyroZ = myData.gyroZ;
+  boardsStruct[myData.board_id-1].accX = myData.accX;
+  boardsStruct[myData.board_id-1].accY = myData.accY;
+  boardsStruct[myData.board_id-1].accZ = myData.accZ;
   received = true;
 }
  
@@ -64,7 +70,8 @@ void loop(){
   // Access the variables for each board
   if(received)
   {
-    Serial.printf("{\"gyro%d\":{\"x\":%3f,\"y\":%3f,\"z\":%3f}}\n",myData.board_id,boardsStruct[myData.board_id-1].x,boardsStruct[myData.board_id-1].y,boardsStruct[myData.board_id-1].z);
+    //Serial.printf("{\"gyro%d\":{\"x\":%3f,\"y\":%3f,\"z\":%3f},\"acc%d\":{\"x\":%3f,\"y\":%3f,\"z\":%3f}}\n",myData.board_id,boardsStruct[myData.board_id-1].gyroX,boardsStruct[myData.board_id-1].gyroY,boardsStruct[myData.board_id-1].gyroZ,myData.board_id,boardsStruct[myData.board_id-1].accX, boardsStruct[myData.board_id-1].accY, boardsStruct[myData.board_id-1].accZ);
+    Serial.printf("%d,%3f,%3f,%3f,%3f,%3f,%3f\n",myData.board_id,boardsStruct[myData.board_id-1].gyroX,boardsStruct[myData.board_id-1].gyroY,boardsStruct[myData.board_id-1].gyroZ,myData.board_id,boardsStruct[myData.board_id-1].accX, boardsStruct[myData.board_id-1].accY, boardsStruct[myData.board_id-1].accZ);
     //Serial.print("Packet received from: ");
     //Serial.printf("Board ID %d:\n", boardsStruct[myData.board_id-1].board_id);
     //Serial.printf("x value: %d \n", boardsStruct[myData.board_id-1].x);
@@ -77,8 +84,7 @@ void loop(){
     received = false;  
   }
   
-  int board1X = boardsStruct[0].x;
-  int board1Y = boardsStruct[0].y;
+  
   //int board2X = boardsStruct[1].x;
   //int board2Y = boardsStruct[1].y;
   
