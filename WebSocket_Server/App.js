@@ -34,7 +34,9 @@ io.on('connection', socket => {
   console.log('success connect!');
 })
 
-///*------ read from sensor input ----------
+
+//------ read from sensor input ----------
+
 
 
 
@@ -50,42 +52,92 @@ const port = new SerialPort('/dev/ttyUSB0', { baudRate: 9600  })
 // feed port input to a line parser
 const parser = port.pipe(new Readline({delimiter: '\n'} ))
 // when parser get a line , send it to the socket
-parser.on('data', line => {  
-    io.sockets.emit('update_data', line);
+parser.on('data', line => {
+    var data = JSON.parse(line);
+    sensor_data = data.gyro2.x+","+data.gyro2.y+","+data.gyro2.z+","+data.acc2.x+","+data.acc2.y+","+data.acc2.z+",";
+    //io.sockets.emit('update_data', line);
     console.log(line);
 })
 
-//*/
+
+
+
+x = 0
+y = 0
+z = 0
+h = 0
+
+
 
 //------ read from sensor joystick --------
 var gamepad = require("gamepad")
 gamepad.init()
-setInterval(gamepad.processEvents, 10);
+setInterval(gamepad.processEvents, 10000);
+var collect_data = false;
+var data = "";
+gamepad.on("up", function (id, num) {
+      if(num==4)
+        collect_data = true;
+      if(num==5)
+      {
+        collect_data = false;
+        console.log("down pressed");
+        record_data(data);
+      }
+
+});
+
+// Listen for button down events on all gamepads
+/*
+gamepad.on("down", function () {
+
+    collect_data = false;
+    console.log("down pressed");
+    record_data(data);
+});
+*/
 gamepad.on("move", function (id, axis, value) {
-    x = 0
-    y = 0
-    z = 0
-    var str = "{\"gyro\":{\"x\":"+x+",\"y\":"+y+",\"z\":"+z+"}}"
-    console.log(value);
-    // 搖桿左右
+
+    var str = "{\"gyro\":{\"x\":"+x+",\"y\":"+y+",\"z\":"+z+",\"h\":"+h+"}}"
+    // 左邊搖桿左右
+    if(axis==0)
+    {
+        z = value*90
+        str = "{\"gyro\":{\"x\":"+x+",\"y\":"+y+",\"z\":"+z+",\"h\":"+h+"}}"
+    }
+    if(axis==1)
+    {
+        h = value*90
+        str = "{\"gyro\":{\"x\":"+x+",\"y\":"+y+",\"z\":"+z+",\"h\":"+h+"}}"
+    }
+    // 右邊搖桿左右
     if(axis==3)
     {
-        x = 0
         y = -value*90
-        z = 0
-        str = "{\"gyro\":{\"x\":"+x+",\"y\":"+y+",\"z\":"+z+"}}"
+        str = "{\"gyro\":{\"x\":"+x+",\"y\":"+y+",\"z\":"+z+",\"h\":"+h+"}}"
     }
-    // 搖桿上下
+    // 右邊搖桿上下
     if(axis==4)
     {
         x = -value*90
-        y = 0
-        z = -value*90
-        str = "{\"gyro\":{\"x\":"+x+",\"y\":"+y+",\"z\":"+z+"}}"
+        str = "{\"gyro\":{\"x\":"+x+",\"y\":"+y+",\"z\":"+z+",\"h\":"+h+"}}"
     }
     io.sockets.emit('update_data', str);
     console.log(str);
+
+    if(collect_data)
+    {
+        data = data + sensor_data+","+ x+","+y+","+z+"\n";
+    }
+
 });
+
+fs = require('fs')
+record_data= function(data){
+    console.log("write_file")
+    console.log(data)
+    fs.writeFile("training_data.txt",data,function(err){});
+};
 
 
     
