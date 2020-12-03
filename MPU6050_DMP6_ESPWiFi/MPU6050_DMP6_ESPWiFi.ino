@@ -150,7 +150,7 @@ float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gra
 #endif
 
 #define INTERRUPT_PIN 15 // use pin 15 on ESP8266
-#define CYCLE  2000000 // the clock cycle between each message event;
+#define CYCLE  1000000 // the clock cycle between each message event;
 const char DEVICE_NAME[] = "mpu6050";
 
 WiFiUDP Udp;                                // A UDP instance to let us send and receive packets over UDP
@@ -170,9 +170,12 @@ uint8_t broadcastAddress[] = {0x50, 0x02, 0x91, 0xdf, 0x34, 0xac};
 
 typedef struct ESP_NOW_MESSAGE{
   int board_id;
-  float x;
-  float y;
-  float z;
+  float gyroX;
+  float gyroY;
+  float gyroZ;
+  float accX;
+  float accY;
+  float accZ;
 }esp_now_message;
 
 esp_now_message sender_message;
@@ -381,14 +384,23 @@ void mpu_loop()
     // display Euler angles in degrees
     mpu.dmpGetQuaternion(&q, fifoBuffer);
     mpu.dmpGetEuler(euler, &q);
-
+    // display initial world-frame acceleration, adjusted to remove gravity
+    // and rotated based on known orientation from quaternion
+    mpu.dmpGetQuaternion(&q, fifoBuffer);
+    mpu.dmpGetAccel(&aa, fifoBuffer);
+    mpu.dmpGetGravity(&gravity, &q);
+    mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
+    mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
     if(asm_ccount()%CYCLE>CYCLE/2&&time0==1){
     Serial.printf("{\"gyro\":{\"x\":%3f,\"y\":%3f,\"z\":%3f}}\n",euler[2] * 180/M_PI, euler[1] * 180/M_PI, euler[0] * 180/M_PI);
-    
+    Serial.printf("{\"acc\":{\"x\":%d , \"y\":%d , \"z\":%d}}\n",aaWorld.x,aaWorld.y,aaWorld.z);
     sender_message.board_id = BOARD_ID;
-    sender_message.x = euler[2] * 180/M_PI;
-    sender_message.y = euler[1] * 180/M_PI;
-    sender_message.z = euler[0] * 180/M_PI;
+    sender_message.gyroX = euler[2] * 180/M_PI;
+    sender_message.gyroY = euler[1] * 180/M_PI;
+    sender_message.gyroZ = euler[0] * 180/M_PI;
+    sender_message.accX = aaWorld.x;
+    sender_message.accY = aaWorld.y;
+    sender_message.accZ = aaWorld.z;
     esp_now_send(0, (uint8_t *) &sender_message, sizeof(sender_message));  
     time0 = 0;
     }
@@ -437,29 +449,6 @@ void mpu_loop()
     Serial.print(aaReal.y);
     Serial.print("\t");
     Serial.println(aaReal.z);
-#endif
-
-#ifdef OUTPUT_READABLE_WORLDACCEL
-    // display initial world-frame acceleration, adjusted to remove gravity
-    // and rotated based on known orientation from quaternion
-    mpu.dmpGetQuaternion(&q, fifoBuffer);
-    mpu.dmpGetAccel(&aa, fifoBuffer);
-    mpu.dmpGetGravity(&gravity, &q);
-    mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
-    mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
-    //Serial.printf("%d\n",asm_ccount()%8000000);
-    if(asm_ccount()%CYCLE>CYCLE/2&&time1==1){
-    Serial.printf("{\"acc\":{\"x\":%d , \"y\":%d , \"z\":%d}}\n",aaWorld.x,aaWorld.y,aaWorld.z);
-    time1 = 0;
-    }
-    if(asm_ccount()%CYCLE<CYCLE/2&&time1==0){
-      time1 = 1;  
-    }
-    /*Serial.print(aaWorld.x);
-    Serial.print("\t");
-    Serial.print(aaWorld.y);
-    Serial.print("\t");
-    Serial.println(aaWorld.z);*/
 #endif
   }
 }

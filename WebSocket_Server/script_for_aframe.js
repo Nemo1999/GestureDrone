@@ -36,9 +36,9 @@ socket.on("update_data", (data) =>
 	//updateView();
 	if(reset){
 	    BiasAng = {
-		Bx: Sensors.gyro.x,
-		By: Sensors.gyro.y,
-		Bz: Sensors.gyro.z
+		Bx: Sensors.gyro2.x,
+		By: Sensors.gyro2.y,
+		Bz: Sensors.gyro2.z
 	    }
 	    reset = false;
 
@@ -68,19 +68,23 @@ const updateView = () => {
 	  //console.log()
 	  //textController.setAttribute("text",`value:${"Temp:"+ Math.round(Sensors.temp * 100)/100+"\nHumid:"+(Math.round(Sensors.humd*100)/100)};color:#EF2D5E`);
 
-	  const Wx = Sensors.gyro.x - BiasAng.Bx;
-	  const Wy = Sensors.gyro.y - BiasAng.By;
-	  const Wz = Sensors.gyro.z - BiasAng.Bz;
-	  const Wh = Sensors.gyro.h;
 
-	  //============= for sensor ==============
-	  if(Wz>5)
+	  const Wx = Sensors.gyro2.x - BiasAng.Bx;
+	  const Wy = Sensors.gyro2.y - BiasAng.By;
+	  const Wz = Sensors.gyro2.z - BiasAng.Bz;
+	  //const rot = rotateController.getAttribute("rotation");
+	  //console.log([rot.x,rot.y,rot.z]);
+
+	  ///*============= for sensor ==============
+	  if(Wz>10)
+
 	      angY += 2;
 	  else if (Wz < -5)
 	      angY -= 2;
 	  else
 	      ;
       //=========================================*/
+
       //============= for sensor ==============
 	  if(Wh>5)
 	      height += 0.2;
@@ -89,7 +93,6 @@ const updateView = () => {
 	  else
 	      ;
       //=========================================*/
-
 
 	  //angY = -\Wz;
       let angle_panelty = 0.3;
@@ -121,4 +124,4 @@ const updateView = () => {
 };
 
 
-setInterval(updateView, 1);
+setInterval(updateView, 100);

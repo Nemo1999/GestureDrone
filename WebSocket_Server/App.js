@@ -22,6 +22,9 @@ app.get('/script_for_aframe.js', (req, res) => {
   res.sendFile(__dirname+'/script_for_aframe.js');
 });
 
+app.get('/kinematic-body.js', (req, res) => {
+  res.sendFile(__dirname+'/kinematic-body.js');
+});
 
 
 //--------------- socket ----------------
@@ -31,7 +34,9 @@ io.on('connection', socket => {
   console.log('success connect!');
 })
 
+
 //------ read from sensor input ----------
+
 
 
 
@@ -56,10 +61,12 @@ parser.on('data', line => {
 
 
 
+
 x = 0
 y = 0
 z = 0
 h = 0
+
 
 
 //------ read from sensor joystick --------
