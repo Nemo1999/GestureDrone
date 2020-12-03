@@ -18,9 +18,10 @@ esp_now_message myData;
 // Create a structure to hold the readings from each board
 esp_now_message board1;
 esp_now_message board2;
+esp_now_message board3;
 
 // Create an array with all the structures
-esp_now_message boardsStruct[2] = {board1, board2};
+esp_now_message boardsStruct[3] = {board1, board2,board3};
 
 // Callback function that will be executed when data is received
 void OnDataRecv(uint8_t * mac_addr, uint8_t *incomingData, uint8_t len) {
@@ -63,7 +64,7 @@ void loop(){
   // Access the variables for each board
   if(received)
   {
-    Serial.printf("{\"gyro\":{\"x\":%3f,\"y\":%3f,\"z\":%3f,\"id\":%d}}\n",boardsStruct[myData.board_id-1].x,boardsStruct[myData.board_id-1].y,boardsStruct[myData.board_id-1].z,boardsStruct[myData.board_id-1].board_id);
+    Serial.printf("{\"gyro%d\":{\"x\":%3f,\"y\":%3f,\"z\":%3f}}\n",myData.board_id,boardsStruct[myData.board_id-1].x,boardsStruct[myData.board_id-1].y,boardsStruct[myData.board_id-1].z);
     //Serial.print("Packet received from: ");
     //Serial.printf("Board ID %d:\n", boardsStruct[myData.board_id-1].board_id);
     //Serial.printf("x value: %d \n", boardsStruct[myData.board_id-1].x);
