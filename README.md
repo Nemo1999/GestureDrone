@@ -16,3 +16,5 @@ https://github.com/p5-serial/p5.serialport
 
 - Currently arduino code is for a special gyro , not the typical MPU-6050
   (This should be changed too)
+
+- reference repo:https://github.com/ElectronicCats/mpu6050
