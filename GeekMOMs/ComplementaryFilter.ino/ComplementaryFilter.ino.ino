@@ -29,12 +29,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ===============================================
 */
+// ================================================================
+// ===                    SETTING FOR ESP_NOW                   ===
+// ================================================================
+# include <espnow.h>
+//# include <WiFi.h>
+#include <ESP8266WiFi.h>
+uint8_t broadcastAddress[] = {0x50, 0x02, 0x91, 0xdf, 0x34, 0xac};
+#define BOARD_ID 3
+
+typedef struct ESP_NOW_MESSAGE{
+  int board_id;
+  float gyroX;
+  float gyroY;
+  float gyroZ;
+  float accX;
+  float accY;
+  float accZ;
+}esp_now_message;
+
+esp_now_message sender_message;
+
+unsigned long lastTime = 0;
+unsigned long timerDelay = 10000;
+
+
+// ================================================================
+// ===                    SETTING FOR MPU_6050                  ===
+// ================================================================
+
 
 // I2Cdev and MPU6050 must be installed as libraries, or else the .cpp/.h files
 // for both classes must be in the include path of your project
 #include "I2Cdev.h"
 #include "MPU6050_6Axis_MotionApps20.h"
 #include "MPU6050.h"
+
+
 
 // Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
 // is used in I2Cdev.h
@@ -107,7 +138,7 @@ inline float get_last_gyro_z_angle() {return last_gyro_z_angle;}
 #define LED_PIN 13
 bool blinkState = false;
 
-void setup() {
+void mpu_setup() {
     //accelgyro.start();
     last_read_time = millis();
     // join I2C bus (I2Cdev library doesn't do this automatically)
@@ -120,7 +151,7 @@ void setup() {
     // initialize serial communication
     // (38400 chosen because it works as well at 8MHz as it does at 16MHz, but
     // it's really up to you depending on your project)
-    Serial.begin(38400);
+    //Serial.begin(38400);
 
     // initialize device
     Serial.println("Initializing I2C devices...");
@@ -146,12 +177,41 @@ void setup() {
     */
 
     // calibration , TODO: set average value 
-    accelgyro.setXGyroOffset(220);
-    accelgyro.setYGyroOffset(76);
-    accelgyro.setZGyroOffset(-85);
-    accelgyro.setXAccelOffset(0.01);
-    accelgyro.setYAccelOffset(0.01);
-    accelgyro.setZAccelOffset(0.01);
+    
+    accelgyro.CalibrateGyro(10);
+    accelgyro.CalibrateAccel(10);
+    accelgyro.PrintActiveOffsets();
+    /*
+    int32_t sum[6];
+    int16_t val[6];
+    for(int i=0;i<1000;i++){
+      accelgyro.getMotion6(&val[0],&val[1],&val[2],&val[3],&val[4],&val[5]);
+      for(int j=0;j<6;j++){
+        sum[j] += val[j];
+      }
+    }
+    for(int j=0;j<6;j++){
+        sum[j] /= 1000;
+    }
+    
+    
+    accelgyro.setXGyroOffset(-sum[3]/4);
+    accelgyro.setYGyroOffset(-sum[4]/4);
+    accelgyro.setZGyroOffset(-sum[5]/4);
+    accelgyro.setXAccelOffset(-sum[0]/8);
+    accelgyro.setYAccelOffset(-sum[1]/8);
+    accelgyro.setZAccelOffset((16384-sum[2])/8);
+    */
+    /*
+    accelgyro.setXGyroOffset(-220/4);
+    accelgyro.setYGyroOffset(20/4);
+    accelgyro.setZGyroOffset(20/4);
+    accelgyro.setXAccelOffset(-30837/7.8);
+    accelgyro.setYAccelOffset(19300/7.8);
+    accelgyro.setZAccelOffset((16384-5600)/7.8);
+    */
+
+  /*
     base_x_accel = accelgyro.getXAccelOffset();
     base_y_accel = accelgyro.getYAccelOffset();
     base_z_accel = accelgyro.getZAccelOffset();
@@ -159,8 +219,8 @@ void setup() {
     base_y_gyro =  accelgyro.getYGyroOffset();
     base_z_gyro =  accelgyro.getZGyroOffset();
 
-
-    /*
+  */
+    
     Serial.print(accelgyro.getXAccelOffset()); Serial.print("\t"); // -76
     Serial.print(accelgyro.getYAccelOffset()); Serial.print("\t"); // -2359
     Serial.print(accelgyro.getZAccelOffset()); Serial.print("\t"); // 1688
@@ -168,12 +228,12 @@ void setup() {
     Serial.print(accelgyro.getYGyroOffset()); Serial.print("\t"); // 0
     Serial.print(accelgyro.getZGyroOffset()); Serial.print("\t"); // 0
     Serial.print("\n");
-    */
+    
    
    set_last_read_angle_data(millis(),0,0,0,0,0,0);
 }
 
-void loop() {
+void mpu_loop() {
   unsigned long t_now = millis();
   
   // read raw accel/gyro measurements from device
@@ -212,13 +272,25 @@ void loop() {
   // Update the saved data with the latest values
   set_last_read_angle_data(t_now, angle_x, angle_y, angle_z, unfiltered_gyro_angle_x, unfiltered_gyro_angle_y, unfiltered_gyro_angle_z);
   
-  // Send the data to the serial port
+  //Send the data to the serial port
+  /*
   Serial.print(F("DEL:"));              //Delta T
   Serial.print(dt, DEC);
-  Serial.print(F("RAW:"));              //Delta T
-  Serial.print(ax,2);
-  Serial.print(ay,2);
-  Serial.print(az,2);
+  Serial.print(F(" #raw_a:"));              //Accelerometer angle
+  Serial.printf("%2d",ax);
+  Serial.print(F(","));
+  Serial.printf("%2d",ay);
+  Serial.print(F(","));
+  Serial.printf("%2d",az);
+  Serial.print(F(" #raw_g:"));              //Accelerometer angle
+  Serial.printf("%2d",gx);
+  Serial.print(F(","));
+  Serial.printf("%2d",gy);
+  Serial.print(F(","));
+  Serial.printf("%2d",gz);
+  Serial.printf("\n");
+  */
+  /*
   Serial.print(F(" #ACC:"));              //Accelerometer angle
   Serial.print(accel_angle_x, 2);
   Serial.print(F(","));
@@ -238,11 +310,88 @@ void loop() {
   Serial.print(F(","));
   Serial.print(angle_z, 2);
   Serial.println(F(""));
-
+  */  
+  //
   //Accelerometer doesn't give z-angle
   // these methods (and a few others) are also available
   //accelgyro.getAcceleration(&ax, &ay, &az);
   //accelgyro.getRotation(&gx, &gy, &gz);
+  
+  //Serial.printf("{\"gyro\":{\"x\":%3f,\"y\":%3f,\"z\":%3f}}\n",angle_x,angle_y,angle_z);
+  //Serial.printf("{\"acc\":{\"x\":%d , \"y\":%d , \"z\":%d}}\n",ax,ay,az);
+  sender_message.board_id = BOARD_ID;
+  sender_message.gyroX = angle_x;
+  sender_message.gyroY = angle_y;
+  sender_message.gyroZ = angle_z;
+  sender_message.accX = ax;
+  sender_message.accY = ay;
+  sender_message.accZ = az;
+  esp_now_send(0, (uint8_t *) &sender_message, sizeof(sender_message));
+  
+  
+  delay(50);
+  
+  
+}
 
-  delay(5);
+
+// ================================================================
+// ===                  FUNCTIONS FOR ESP_NOW                   ===
+// ================================================================
+
+
+void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
+  Serial.print("\r\nLast Packet Send Status: ");
+  if (sendStatus == 0){
+    Serial.println("Delivery success");
+  }
+  else{
+    Serial.println("Delivery fail");
+  }
+}
+
+
+void esp_setup()
+{
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+
+  // Init ESP-NOW
+  if (esp_now_init() != 0) {
+    Serial.println("Error initializing ESP-NOW");
+    return;
+  } 
+  // Set ESP-NOW role
+  esp_now_set_self_role(ESP_NOW_ROLE_CONTROLLER);
+
+  // Once ESPNow is successfully init, we will register for Send CB to
+  // get the status of Trasnmitted packet
+  esp_now_register_send_cb(OnDataSent);
+  
+  // Register peer
+  esp_now_add_peer(broadcastAddress, ESP_NOW_ROLE_SLAVE, 1, NULL, 0);
+  
+}
+
+
+// ================================================================
+// ===                   main setup and loop                    ===
+// ================================================================
+
+volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
+void DataReady() {
+    mpuInterrupt = true;
+}
+
+void loop(void)
+{
+  mpu_loop();
+}
+
+void setup(void)
+{
+  Serial.begin(9600);
+  Serial.println(F("\nOrientation Sensor OSC output")); Serial.println();
+  esp_setup();
+  mpu_setup();
 }
