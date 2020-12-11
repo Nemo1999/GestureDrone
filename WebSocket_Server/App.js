@@ -43,7 +43,15 @@ io.on('connection', socket => {
 const SerialPort = require('serialport')
 const Readline = require('@serialport/parser-readline')
 
-    
+x = 0
+y = 0
+z = 0
+h = 0
+var joystick_time = "0";
+var date = new Date();
+var sensor_1="";
+var sensor_2="";
+var sensor_3="";    
 // open serial port
 
 const port = new SerialPort('/dev/ttyUSB0', { baudRate: 9600  })
@@ -53,31 +61,42 @@ const port = new SerialPort('/dev/ttyUSB0', { baudRate: 9600  })
 const parser = port.pipe(new Readline({delimiter: '\n'} ))
 // when parser get a line , send it to the socket
 parser.on('data', line => {
-    var data = JSON.parse(line);
-    sensor_data = data.gyro2.x+","+data.gyro2.y+","+data.gyro2.z+","+data.acc2.x+","+data.acc2.y+","+data.acc2.z+",";
+    //var data = JSON.parse(line);
+    //sensor_data = data.gyro2.x+","+data.gyro2.y+","+data.gyro2.z+","+data.acc2.x+","+data.acc2.y+","+data.acc2.z+",";
     //io.sockets.emit('update_data', line);
+    
+    h = date.getUTCHours();
+    m = date.getUTCMinutes();
+    s = date.getUTCSeconds();
+    var sensor_time = h+":"+m+":"+s;
+    parsed_data = line.split(",");
+    if(parsed_data[0]==1)
+      sensor_1 = line
+    if(parsed_data[0]==2)
+      sensor_2 = line
+    if(parsed_data[0]==3)
+      sensor_3 = line
+    //sensor_data = sensor_time+","+line;
+    if(collect_data)
+    {
+        data = data + sensor_time+","+sensor_1+","+sensor_2+","+sensor_3+","+joystick_time+","+ x+","+y+","+z+"\n";
+    }
     console.log(line);
-})
-
-
-
-
-x = 0
-y = 0
-z = 0
-h = 0
+  }
+)
 
 
 
 //------ read from sensor joystick --------
 var gamepad = require("gamepad")
 gamepad.init()
-setInterval(gamepad.processEvents, 10000);
+setInterval(gamepad.processEvents, 10);
 var collect_data = false;
 var data = "";
 gamepad.on("up", function (id, num) {
       if(num==4)
         collect_data = true;
+        console.log("record start");
       if(num==5)
       {
         collect_data = false;
@@ -123,12 +142,11 @@ gamepad.on("move", function (id, axis, value) {
         str = "{\"gyro\":{\"x\":"+x+",\"y\":"+y+",\"z\":"+z+",\"h\":"+h+"}}"
     }
     io.sockets.emit('update_data', str);
-    console.log(str);
-
-    if(collect_data)
-    {
-        data = data + sensor_data+","+ x+","+y+","+z+"\n";
-    }
+    //console.log(str);
+    h = date.getUTCHours();
+    m = date.getUTCMinutes();
+    s = date.getUTCSeconds();
+    joystick_time = h+":"+m+":"+s;
 
 });
 
