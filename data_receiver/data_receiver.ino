@@ -71,7 +71,7 @@ void loop(){
   if(received)
   {
     //Serial.printf("{\"gyro%d\":{\"x\":%3f,\"y\":%3f,\"z\":%3f},\"acc%d\":{\"x\":%3f,\"y\":%3f,\"z\":%3f}}\n",myData.board_id,boardsStruct[myData.board_id-1].gyroX,boardsStruct[myData.board_id-1].gyroY,boardsStruct[myData.board_id-1].gyroZ,myData.board_id,boardsStruct[myData.board_id-1].accX, boardsStruct[myData.board_id-1].accY, boardsStruct[myData.board_id-1].accZ);
-    Serial.printf("%d,%3f,%3f,%3f,%3f,%3f,%3f\n",myData.board_id,boardsStruct[myData.board_id-1].gyroX,boardsStruct[myData.board_id-1].gyroY,boardsStruct[myData.board_id-1].gyroZ,myData.board_id,boardsStruct[myData.board_id-1].accX, boardsStruct[myData.board_id-1].accY, boardsStruct[myData.board_id-1].accZ);
+    Serial.printf("%d,%3f,%3f,%3f,%3f,%3f,%3f\n",myData.board_id,boardsStruct[myData.board_id-1].gyroX,boardsStruct[myData.board_id-1].gyroY,boardsStruct[myData.board_id-1].gyroZ,boardsStruct[myData.board_id-1].accX, boardsStruct[myData.board_id-1].accY, boardsStruct[myData.board_id-1].accZ);
     //Serial.print("Packet received from: ");
     //Serial.printf("Board ID %d:\n", boardsStruct[myData.board_id-1].board_id);
     //Serial.printf("x value: %d \n", boardsStruct[myData.board_id-1].x);

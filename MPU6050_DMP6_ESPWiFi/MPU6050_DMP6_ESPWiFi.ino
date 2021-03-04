@@ -70,7 +70,7 @@ static inline uint32_t asm_ccount(void) {
 #include "I2Cdev.h"
 
 #include "MPU6050_6Axis_MotionApps20.h"
-//#include "MPU6050.h" // not necessary if using MotionApps include file
+#include "MPU6050.h" // not necessary if using MotionApps include file
 
 // Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
 // is used in I2Cdev.h
@@ -99,6 +99,11 @@ uint16_t packetSize;    // expected DMP packet size (default is 42 bytes)
 uint16_t fifoCount;     // count of all bytes currently in FIFO
 uint8_t fifoBuffer[64]; // FIFO storage buffer
 
+int16_t ax,ay,az;
+int16_t gx, gy, gz;
+
+mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+
 // orientation/motion vars
 Quaternion q;           // [w, x, y, z]         quaternion container
 VectorInt16 aa;         // [x, y, z]            accel sensor measurements
@@ -114,8 +119,6 @@ VectorFloat gravity;    // [x, y, z]            gravity vector
 // uncomment "OUTPUT_READABLE_EULER" if you want to see Euler angles
 // (in degrees) calculated from the quaternions coming from the FIFO.
 // Note that Euler angles suffer from gimbal lock (for more info, see
-// http://en.wikipedia.org/wiki/Gimbal_lock)
-#define OUTPUT_READABLE_EULER
 
 // uncomment "OUTPUT_READABLE_YAWPITCHROLL" if you want to see the yaw/
 // pitch/roll angles (in degrees) calculated from the quaternions coming
@@ -230,7 +233,7 @@ void esp_setup()
 // ================================================================
 
 volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
-void dmpDataReady() {
+void DataReady() {
     mpuInterrupt = true;
 }
 
@@ -255,7 +258,7 @@ void mpu_setup()
 
   // load and configure the DMP
   Serial.println(F("Initializing DMP..."));
-  devStatus = mpu.dmpInitialize();
+  devStatus = mpu.Initialize();
 
   // supply your own gyro offsets here, scaled for min sensitivity
   //mpu.setXGyroOffset(220);
@@ -384,7 +387,9 @@ void mpu_loop()
     // display Euler angles in degrees
     mpu.dmpGetQuaternion(&q, fifoBuffer);
     mpu.dmpGetEuler(euler, &q);
-    // display initial world-frame acceleration, adjusted to remove gravity
+
+    
+    // display initial world-frame acceleration, adjusted to remove 
     // and rotated based on known orientation from quaternion
     mpu.dmpGetQuaternion(&q, fifoBuffer);
     mpu.dmpGetAccel(&aa, fifoBuffer);

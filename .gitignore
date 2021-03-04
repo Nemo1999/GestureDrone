@@ -1,3 +1,7 @@
 /ESP_NOW_Sender_Many_to_One/
 /WebSocket_Server/node_modules/*
 /WebSocket_Server/local-cert-generator/
+MPU6050_DMP6_ESPWiFi
+WebSocket_Server/training_data.txt
+*training_data*
+WebSocket_Server/traning_data*
