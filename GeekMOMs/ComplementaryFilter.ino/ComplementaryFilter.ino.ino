@@ -35,8 +35,9 @@ THE SOFTWARE.
 # include <espnow.h>
 //# include <WiFi.h>
 #include <ESP8266WiFi.h>
-uint8_t broadcastAddress[] = {0x50, 0x02, 0x91, 0xdf, 0x34, 0xac};
-#define BOARD_ID 3
+//ESP Board MAC Address:  A0:20:A6:1A:40:FB
+uint8_t broadcastAddress[] = {0xA0, 0x20, 0xA6, 0x1A, 0x40, 0xFB};
+#define BOARD_ID 2
 
 typedef struct ESP_NOW_MESSAGE{
   int board_id;
@@ -217,7 +218,7 @@ void mpu_loop() {
   set_last_read_angle_data(t_now, angle_x, angle_y, angle_z, unfiltered_gyro_angle_x, unfiltered_gyro_angle_y, unfiltered_gyro_angle_z);
   
   //Send the data to the serial port
-  
+  /*
   Serial.print(F("DEL:"));              //Delta T
   Serial.print(dt, DEC);
   Serial.print(F(" #raw_a:"));              //Accelerometer raw 
@@ -233,7 +234,7 @@ void mpu_loop() {
   Serial.print(F(","));
   Serial.printf("%2d",gz);
   Serial.printf("\n");
-  
+  */
   /*
   Serial.print(F(" #ACC:"));              //Accelerometer angle
   Serial.print(accel_angle_x, 2);
@@ -255,7 +256,7 @@ void mpu_loop() {
   Serial.print(angle_z, 2);
   Serial.println(F(""));
   */  
-  //
+  
   //Accelerometer doesn't give z-angle
   // these methods (and a few others) are also available
   //accelgyro.getAcceleration(&ax, &ay, &az);
