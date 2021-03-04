@@ -128,16 +128,6 @@ inline float get_last_gyro_z_angle() {return last_gyro_z_angle;}
 // not so easy to parse, and slow(er) over UART.
 #define OUTPUT_READABLE_ACCELGYRO
 
-// uncomment "OUTPUT_BINARY_ACCELGYRO" to send all 6 axes of data as 16-bit
-// binary, one right after the other. This is very fast (as fast as possible
-// without compression or data loss), and easy to parse, but impossible to read
-// for a human.
-//#define OUTPUT_BINARY_ACCELGYRO
-
-
-#define LED_PIN 13
-bool blinkState = false;
-
 void mpu_setup() {
     //accelgyro.start();
     last_read_time = millis();
@@ -161,65 +151,14 @@ void mpu_setup() {
     Serial.println("Testing device connections...");
     Serial.println(accelgyro.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
 
-
-    
-    // use the code below to change accel/gyro offset values
-    /*
-    Serial.println("Updating internal sensor offsets...");
-    // -76  -2359 1688  0 0 0
-    Serial.print(accelgyro.getXAccelOffset()); Serial.print("\t"); // -76
-    Serial.print(accelgyro.getYAccelOffset()); Serial.print("\t"); // -2359
-    Serial.print(accelgyro.getZAccelOffset()); Serial.print("\t"); // 1688
-    Serial.print(accelgyro.getXGyroOffset()); Serial.print("\t"); // 0
-    Serial.print(accelgyro.getYGyroOffset()); Serial.print("\t"); // 0
-    Serial.print(accelgyro.getZGyroOffset()); Serial.print("\t"); // 0
-    Serial.print("\n");
-    */
-
     // calibration , TODO: set average value 
     
     accelgyro.CalibrateGyro(10);
     accelgyro.CalibrateAccel(10);
     accelgyro.PrintActiveOffsets();
-    /*
-    int32_t sum[6];
-    int16_t val[6];
-    for(int i=0;i<1000;i++){
-      accelgyro.getMotion6(&val[0],&val[1],&val[2],&val[3],&val[4],&val[5]);
-      for(int j=0;j<6;j++){
-        sum[j] += val[j];
-      }
-    }
-    for(int j=0;j<6;j++){
-        sum[j] /= 1000;
-    }
     
     
-    accelgyro.setXGyroOffset(-sum[3]/4);
-    accelgyro.setYGyroOffset(-sum[4]/4);
-    accelgyro.setZGyroOffset(-sum[5]/4);
-    accelgyro.setXAccelOffset(-sum[0]/8);
-    accelgyro.setYAccelOffset(-sum[1]/8);
-    accelgyro.setZAccelOffset((16384-sum[2])/8);
-    */
-    /*
-    accelgyro.setXGyroOffset(-220/4);
-    accelgyro.setYGyroOffset(20/4);
-    accelgyro.setZGyroOffset(20/4);
-    accelgyro.setXAccelOffset(-30837/7.8);
-    accelgyro.setYAccelOffset(19300/7.8);
-    accelgyro.setZAccelOffset((16384-5600)/7.8);
-    */
-
-  /*
-    base_x_accel = accelgyro.getXAccelOffset();
-    base_y_accel = accelgyro.getYAccelOffset();
-    base_z_accel = accelgyro.getZAccelOffset();
-    base_x_gyro =  accelgyro.getXGyroOffset();
-    base_y_gyro =  accelgyro.getYGyroOffset();
-    base_z_gyro =  accelgyro.getZGyroOffset();
-
-  */
+  
     
     Serial.print(accelgyro.getXAccelOffset()); Serial.print("\t"); // -76
     Serial.print(accelgyro.getYAccelOffset()); Serial.print("\t"); // -2359
@@ -232,6 +171,11 @@ void mpu_setup() {
    
    set_last_read_angle_data(millis(),0,0,0,0,0,0);
 }
+
+
+// ================================================================
+// ===       Read Gyro/Accel Data and Implement Filter          ===
+// ================================================================
 
 void mpu_loop() {
   unsigned long t_now = millis();
@@ -273,23 +217,23 @@ void mpu_loop() {
   set_last_read_angle_data(t_now, angle_x, angle_y, angle_z, unfiltered_gyro_angle_x, unfiltered_gyro_angle_y, unfiltered_gyro_angle_z);
   
   //Send the data to the serial port
-  /*
+  
   Serial.print(F("DEL:"));              //Delta T
   Serial.print(dt, DEC);
-  Serial.print(F(" #raw_a:"));              //Accelerometer angle
+  Serial.print(F(" #raw_a:"));              //Accelerometer raw 
   Serial.printf("%2d",ax);
   Serial.print(F(","));
   Serial.printf("%2d",ay);
   Serial.print(F(","));
   Serial.printf("%2d",az);
-  Serial.print(F(" #raw_g:"));              //Accelerometer angle
+  Serial.print(F(" #raw_g:"));              //Gyro  raw
   Serial.printf("%2d",gx);
   Serial.print(F(","));
   Serial.printf("%2d",gy);
   Serial.print(F(","));
   Serial.printf("%2d",gz);
   Serial.printf("\n");
-  */
+  
   /*
   Serial.print(F(" #ACC:"));              //Accelerometer angle
   Serial.print(accel_angle_x, 2);
@@ -341,7 +285,7 @@ void mpu_loop() {
 
 
 void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
-  Serial.print("\r\nLast Packet Send Status: ");
+  Serial.print("Last Packet Send Status: ");
   if (sendStatus == 0){
     Serial.println("Delivery success");
   }
