@@ -12,7 +12,7 @@ var certOptions = {
 const http = require('https')
 
 const server = http.createServer(certOptions ,app)
-      .listen( 3000,"0.0.0.0", ()=>{console.log('listening on 0.0.0.0 , port 3000')})
+      .listen( 3000,"0.0.0.0", ()=>{console.log('https server listening on 0.0.0.0 , port 3000')})
 
 app.get('/', (req, res) => {
   //res.sendFile(__dirname+'/index.html');
@@ -40,9 +40,69 @@ io.on('connection', socket => {
 })
 
 
+// read osc input
+let gyro = {a:0,b:0,c:0}
+
+var osc = require("osc");
+var getIPAddresses = function () {
+  var os = require("os"),
+      interfaces = os.networkInterfaces(),
+      ipAddresses = [];
+
+  for (var deviceName in interfaces) {
+      var addresses = interfaces[deviceName];
+      for (var i = 0; i < addresses.length; i++) {
+          var addressInfo = addresses[i];
+          if (addressInfo.family === "IPv4" && !addressInfo.internal) {
+              ipAddresses.push(addressInfo.address);
+          }
+      }
+  }
+
+  return ipAddresses;
+};
+
+var udpPort = new osc.UDPPort({
+  localAddress: "0.0.0.0",
+  localPort: 57121
+});
+
+udpPort.on("ready", function () {
+  var ipAddresses = getIPAddresses();
+
+  console.log("Listening for OSC over UDP.");
+  ipAddresses.forEach(function (address) {
+      console.log(" Host:", address + ", Port:", udpPort.options.localPort);
+  });
+});
+
+udpPort.on("message", function (oscMessage) {
+  console.log(oscMessage);
+  switch(oscMessage.address){
+    case '/orientation/alpha':
+      gyro.a = oscMessage.args[0]
+    break;
+    case '/orientation/beta':
+      gyro.b = oscMessage.args[0]
+    break;
+    case '/orientation/gamma':
+      gyro.c = oscMessage.args[0]
+    break;
+    default:
+  }
+});
+
+udpPort.on("error", function (err) {
+  console.log(err);
+});
+
+udpPort.open();
+
+setInterval(()=>{io.sockets.emit('update_data',gyro)},100);
+
 //------ read from sensor input ----------
 
-
+/*
 const SerialPort = require('serialport')
 const Readline = require('@serialport/parser-readline')
 
@@ -90,8 +150,8 @@ parser.on('data', line => {
   }
 )
 
-
-
+*/
+/*
 //------ read from sensor joystick --------
 var gamepad = require("gamepad")
 gamepad.init()
@@ -120,7 +180,7 @@ gamepad.on("down", function () {
     console.log("down pressed");
     record_data(data);
 });
-*/
+
 gamepad.on("move", function (id, axis, value) {
 
     var str = "{\"gyro\":{\"x\":"+x+",\"y\":"+y+",\"z\":"+z+",\"h\":"+h+"}}"
@@ -155,7 +215,7 @@ gamepad.on("move", function (id, axis, value) {
     joystick_time = h+":"+m+":"+s;
 
 });
-
+*/
 fs = require('fs')
 record_data= function(data){
     l = data.split("\r\n|\r|\n").length;     
