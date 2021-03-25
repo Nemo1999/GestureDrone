@@ -15,11 +15,16 @@ const server = http.createServer(certOptions ,app)
       .listen( 3000,"0.0.0.0", ()=>{console.log('listening on 0.0.0.0 , port 3000')})
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname+'/index.html');
+  //res.sendFile(__dirname+'/index.html');
+  res.sendFile(__dirname+'/visualization.html');
 });
 
 app.get('/script_for_aframe.js', (req, res) => {
   res.sendFile(__dirname+'/script_for_aframe.js');
+});
+
+app.get('/script_for_visualization.js', (req, res) => {
+  res.sendFile(__dirname+'/script_for_visualization.js');
 });
 
 app.get('/kinematic-body.js', (req, res) => {
@@ -38,10 +43,9 @@ io.on('connection', socket => {
 //------ read from sensor input ----------
 
 
-
-
 const SerialPort = require('serialport')
 const Readline = require('@serialport/parser-readline')
+
 
 x = 0
 y = 0
@@ -63,8 +67,7 @@ const parser = port.pipe(new Readline({delimiter: '\n'} ))
 parser.on('data', line => {
     //var data = JSON.parse(line);
     //sensor_data = data.gyro2.x+","+data.gyro2.y+","+data.gyro2.z+","+data.acc2.x+","+data.acc2.y+","+data.acc2.z+",";
-    //io.sockets.emit('update_data', line);
-    
+    io.sockets.emit('update_data',line);
     h = date.getUTCHours();
     m = date.getUTCMinutes();
     s = date.getUTCSeconds();

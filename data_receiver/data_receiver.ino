@@ -64,11 +64,20 @@ void setup() {
   esp_now_set_self_role(ESP_NOW_ROLE_SLAVE);
   esp_now_register_recv_cb(OnDataRecv);
   
+  for(int i=0;i<3;i++){
+    boardsStruct[i].gyroX = 0;
+    boardsStruct[i].gyroY = 0;
+    boardsStruct[i].gyroZ = 0;
+    boardsStruct[i].accX = 0;
+    boardsStruct[i].accY = 0;
+    boardsStruct[i].accZ = 0;
+  }
+
 }
 
 void loop(){
   // Access the variables for each board
-  if(received[0] && received[1] && received[2])
+  if(/*received[0] &&*/ received[1] /*&& received[2]*/)
   {
     //Serial.printf("{\"gyro%d\":{\"x\":%3f,\"y\":%3f,\"z\":%3f},\"acc%d\":{\"x\":%3f,\"y\":%3f,\"z\":%3f}}\n",myData.board_id,boardsStruct[myData.board_id-1].gyroX,boardsStruct[myData.board_id-1].gyroY,boardsStruct[myData.board_id-1].gyroZ,myData.board_id,boardsStruct[myData.board_id-1].accX, boardsStruct[myData.board_id-1].accY, boardsStruct[myData.board_id-1].accZ);
     //Serial.printf("%d,%3f,%3f,%3f,%3f,%3f,%3f\n",myData.board_id,boardsStruct[myData.board_id-1].gyroX,boardsStruct[myData.board_id-1].gyroY,boardsStruct[myData.board_id-1].gyroZ,boardsStruct[myData.board_id-1].accX, boardsStruct[myData.board_id-1].accY, boardsStruct[myData.board_id-1].accZ);

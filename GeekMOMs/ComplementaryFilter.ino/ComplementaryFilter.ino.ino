@@ -52,7 +52,7 @@ typedef struct ESP_NOW_MESSAGE{
 esp_now_message sender_message;
 
 unsigned long lastTime = 0;
-unsigned long timerDelay = 10000;
+unsigned long timerDelay = 1000;
 
 
 // ================================================================
