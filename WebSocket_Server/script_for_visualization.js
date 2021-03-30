@@ -41,7 +41,7 @@ const updateView = (gyro) => {
 
 	//rotateY.setAttribute("rotation",{x:0,y:angle_panelty*angY,z:0});//current
 	//rotateController.setAttribute("rotation", { x: angle_panelty*Wx, y:0 , z: -(Wy*angle_panelty) });
-	torsoController.setAttribute("rotation", { x: gyro.a, y: gyro.b, z: gyro.c });
+	torsoController.setAttribute("rotation", { x: gyro.b , y: gyro.a, z: ((-gyro.c<180)? (-gyro.c+360):(-gyro.c) ) });
 	//const { x, y, z } = translateController.getAttribute("position");
 	/*translateController.setAttribute("position", {
 		x: x + dx1 + dx2,

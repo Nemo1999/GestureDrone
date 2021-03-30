@@ -98,7 +98,7 @@ udpPort.on("error", function (err) {
 
 udpPort.open();
 
-setInterval(()=>{io.sockets.emit('update_data',gyro)},100);
+setInterval(()=>{io.sockets.emit('update_data',gyro)},50);
 
 //------ read from sensor input ----------
 
